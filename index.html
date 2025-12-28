@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English-Hebrew Flashcards</title>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #1a4d2e;
+            --secondary: #e8b931;
+            --accent: #d4526e;
+            --bg: #f8f5f0;
+            --card-bg: #ffffff;
+            --text-dark: #2d3142;
+            --text-light: #6b7280;
+            --shadow: rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Crimson Pro', serif;
+            background: linear-gradient(135deg, #f8f5f0 0%, #e8dfd0 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            background-attachment: fixed;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(232, 185, 49, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(212, 82, 110, 0.08) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: slideDown 0.6s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            font-size: 3rem;
+            color: var(--primary);
+            margin-bottom: 10px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.9rem;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .score-board {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 40px;
+            animation: fadeIn 0.8s ease-out 0.2s backwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .score-item {
+            background: var(--card-bg);
+            padding: 20px 40px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px var(--shadow);
+            text-align: center;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .score-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px var(--shadow);
+        }
+
+        .score-item.known {
+            border-color: var(--primary);
+        }
+
+        .score-item.learning {
+            border-color: var(--accent);
+        }
+
+        .score-label {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-light);
+            margin-bottom: 8px;
+        }
+
+        .score-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .card-container {
+            perspective: 1000px;
+            margin-bottom: 30px;
+            animation: fadeIn 1s ease-out 0.4s backwards;
+        }
+
+        .flashcard {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            transform-style: preserve-3d;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+
+        .flashcard.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            box-shadow: 0 10px 40px var(--shadow);
+        }
+
+        .card-front {
+            background: linear-gradient(135deg, var(--primary) 0%, #2d6a4f 100%);
+            color: white;
+        }
+
+        .card-back {
+            background: var(--card-bg);
+            transform: rotateY(180deg);
+            border: 3px solid var(--secondary);
+        }
+
+        .word-type {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            opacity: 0.8;
+            margin-bottom: 20px;
+        }
+
+        .english-word {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        .card-front .english-word {
+            color: white;
+        }
+
+        .card-back .english-word {
+            color: var(--text-dark);
+            font-size: 2.5rem;
+        }
+
+        .hebrew-translation {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 30px;
+            font-weight: 600;
+            direction: rtl;
+        }
+
+        .question {
+            font-family: 'Space Mono', monospace;
+            font-size: 1rem;
+            color: var(--text-light);
+            margin-bottom: 25px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 20px;
+        }
+
+        .btn {
+            font-family: 'Space Mono', monospace;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px var(--shadow);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px var(--shadow);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-yes {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-yes:hover {
+            background: #2d6a4f;
+        }
+
+        .btn-no {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-no:hover {
+            background: #c04158;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 30px;
+            animation: fadeIn 1s ease-out 0.6s backwards;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+            transition: width 0.5s ease;
+            border-radius: 10px;
+        }
+
+        .flip-hint {
+            text-align: center;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--text-light);
+            margin-top: 20px;
+            opacity: 0.7;
+        }
+
+        .results-screen {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 50px;
+            box-shadow: 0 10px 40px var(--shadow);
+            text-align: center;
+            animation: scaleIn 0.6s ease-out;
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .results-title {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 30px;
+            font-weight: 700;
+        }
+
+        .results-stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .stat-box {
+            padding: 20px 30px;
+            border-radius: 12px;
+            background: var(--bg);
+        }
+
+        .stat-label {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .words-to-review {
+            margin-top: 40px;
+            text-align: left;
+        }
+
+        .review-title {
+            font-size: 1.5rem;
+            color: var(--accent);
+            margin-bottom: 20px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .word-list {
+            columns: 2;
+            column-gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .word-item {
+            break-inside: avoid;
+            padding: 12px 20px;
+            background: var(--bg);
+            border-radius: 8px;
+            margin-bottom: 12px;
+            border-left: 4px solid var(--accent);
+        }
+
+        .word-item .english {
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 4px;
+        }
+
+        .word-item .hebrew {
+            color: var(--text-light);
+            direction: rtl;
+            font-size: 0.95rem;
+        }
+
+        .btn-restart {
+            background: var(--primary);
+            color: white;
+            margin-top: 20px;
+        }
+
+        .btn-restart:hover {
+            background: #2d6a4f;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .flashcard {
+                height: 350px;
+            }
+
+            .english-word {
+                font-size: 2.5rem;
+            }
+
+            .card-back .english-word {
+                font-size: 2rem;
+            }
+
+            .hebrew-translation {
+                font-size: 2rem;
+            }
+
+            .word-list {
+                columns: 1;
+            }
+
+            .button-group {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 Vocabulary Flashcards</h1>
+            <p class="subtitle">English → Hebrew</p>
+        </div>
+
+        <div class="score-board">
+            <div class="score-item known">
+                <div class="score-label">Known</div>
+                <div class="score-value" id="knownScore">0</div>
+            </div>
+            <div class="score-item learning">
+                <div class="score-label">Learning</div>
+                <div class="score-value" id="learningScore">0</div>
+            </div>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <div id="cardArea"></div>
+    </div>
+
+    <script>
+        const words = [
+            // Part 2
+            { english: "adjective", type: "n", hebrew: "שם תואר" },
+            { english: "adverb", type: "n", hebrew: "תואר הפועל" },
+            { english: "arrange", type: "v", hebrew: "לארגן" },
+            { english: "at all", type: "phrase", hebrew: "בכלל" },
+            { english: "attitude", type: "n", hebrew: "גישה" },
+            { english: "be expecting (someone)", type: "phrase", hebrew: "לצפות (למישהו)" },
+            { english: "board", type: "v", hebrew: "לעלות (לאוטובוס/מטוס)" },
+            { english: "certain", type: "adj", hebrew: "בטוח, מסוים" },
+            { english: "complex", type: "adj", hebrew: "מורכב" },
+            { english: "crucial", type: "adj", hebrew: "מכריע, חיוני" },
+            { english: "culture", type: "n", hebrew: "תרבות" },
+            { english: "dictation", type: "n", hebrew: "הכתבה" },
+            { english: "eventually", type: "adv", hebrew: "בסופו של דבר" },
+            { english: "excuse", type: "n", hebrew: "תירוץ" },
+            { english: "experience", type: "n", hebrew: "ניסיון, חוויה" },
+            { english: "gas", type: "n", hebrew: "דלק, גז" },
+            { english: "in other words", type: "phrase", hebrew: "במילים אחרות" },
+            { english: "just", type: "adv", hebrew: "רק, בדיוק" },
+            { english: "knock", type: "v", hebrew: "לדפוק" },
+            { english: "later", type: "adv", hebrew: "מאוחר יותר" },
+            { english: "lay the table", type: "phrase", hebrew: "לערוך את השולחן" },
+            { english: "noticeboard", type: "n", hebrew: "לוח מודעות" },
+            { english: "noun", type: "n", hebrew: "שם עצם" },
+            { english: "paragraph", type: "n", hebrew: "פסקה" },
+            { english: "pass through", type: "phrase", hebrew: "לעבור דרך" },
+            { english: "period", type: "n", hebrew: "תקופה, פרק זמן" },
+            { english: "phrase", type: "n", hebrew: "ביטוי" },
+            { english: "plural", type: "n, adj", hebrew: "רבים" },
+            { english: "question mark", type: "n", hebrew: "סימן שאלה" },
+            { english: "rather", type: "adv", hebrew: "די, למדי" },
+            { english: "relatively", type: "adv", hebrew: "יחסית" },
+            { english: "route", type: "n", hebrew: "מסלול" },
+            { english: "singular", type: "adj", hebrew: "יחיד" },
+            { english: "tense", type: "n", hebrew: "זמן (דקדוק)" },
+            { english: "the press", type: "n", hebrew: "העיתונות" },
+            { english: "to be honest", type: "phrase", hebrew: "למען האמת" },
+            { english: "tone", type: "n", hebrew: "טון, צליל" },
+            { english: "understanding", type: "n", hebrew: "הבנה" },
+            { english: "advantage", type: "n", hebrew: "יתרון" },
+            { english: "disadvantage", type: "n", hebrew: "חיסרון" },
+            { english: "express", type: "v", hebrew: "לבטא" },
+            { english: "in detail", type: "phrase", hebrew: "בפירוט" },
+            { english: "in fact", type: "phrase", hebrew: "למעשה" },
+            { english: "notes", type: "n", hebrew: "הערות" },
+            { english: "opinion", type: "n", hebrew: "דעה" },
+            { english: "speaker", type: "n", hebrew: "דובר" },
+            { english: "speech", type: "n", hebrew: "נאום" },
+            { english: "support", type: "v", hebrew: "לתמוך" },
+            { english: "topic", type: "n", hebrew: "נושא" },
+            
+            // Review Part 1
+            { english: "ancient", type: "adj", hebrew: "עתיק" },
+            { english: "article", type: "n", hebrew: "מאמר, כתבה" },
+            { english: "as if", type: "phrase", hebrew: "כאילו" },
+            { english: "attach", type: "v", hebrew: "לצרף" },
+            { english: "attempt", type: "v", hebrew: "לנסות" },
+            { english: "base on", type: "phrase", hebrew: "להתבסס על" },
+            { english: "borrow", type: "v", hebrew: "לשאול (חפץ)" },
+            { english: "bring (someone) luck", type: "phrase", hebrew: "להביא מזל" },
+            { english: "care", type: "v", hebrew: "לדאוג" },
+            { english: "colleague", type: "n", hebrew: "עמית" },
+            { english: "consider (to be)", type: "v", hebrew: "לשקול, להחשיב" },
+            { english: "contrast", type: "n, v", hebrew: "ניגוד" },
+            { english: "cut", type: "phrase", hebrew: "לקצר" },
+            { english: "defend", type: "v", hebrew: "להגן" },
+            { english: "deny", type: "v", hebrew: "להכחיש" },
+            { english: "dive", type: "v", hebrew: "לצלול" },
+            { english: "duty", type: "n", hebrew: "חובה" },
+            { english: "elementary", type: "adj", hebrew: "יסודי" },
+            { english: "elevator", type: "n", hebrew: "מעלית" },
+            { english: "every single", type: "phrase", hebrew: "כל אחד ואחד" },
+            { english: "excitement", type: "n", hebrew: "התרגשות" },
+            { english: "favor", type: "n", hebrew: "טובה" },
+            { english: "find (it) (funny)", type: "phrase", hebrew: "למצוא (משהו) (מצחיק)" },
+            { english: "fire", type: "n, v", hebrew: "אש, לפטר" },
+            { english: "for instance", type: "phrase", hebrew: "לדוגמה" },
+            { english: "forgive", type: "v", hebrew: "לסלוח" },
+            { english: "gather", type: "v", hebrew: "לאסוף, להתאסף" },
+            { english: "give (someone) a call", type: "phrase", hebrew: "להתקשר למישהו" },
+            { english: "happiness", type: "n", hebrew: "אושר" },
+            { english: "hardly", type: "adv", hebrew: "בקושי" },
+            { english: "hit", type: "n", hebrew: "להצלחה, להכות" },
+            { english: "importance", type: "n", hebrew: "חשיבות" },
+            { english: "jar", type: "n", hebrew: "צנצנת" },
+            { english: "joke", type: "n", hebrew: "בדיחה" },
+            { english: "laugh at", type: "phrase", hebrew: "לצחוק על" },
+            { english: "mean", type: "adj", hebrew: "מרושע, ממוצע" },
+            { english: "midday", type: "n", hebrew: "צהריים" },
+            { english: "mind", type: "n, v", hebrew: "מוח, להפריע" },
+            { english: "nowadays", type: "adv", hebrew: "כיום" },
+            { english: "play a trick on", type: "phrase", hebrew: "לשחק קונדס" },
+            { english: "pop", type: "n", hebrew: "פופ" },
+            { english: "record", type: "n, v", hebrew: "תקליט, להקליט" },
+            { english: "result in", type: "phrase", hebrew: "לגרום ל" },
+            { english: "roll", type: "n, v", hebrew: "גליל, להתגלגל" },
+            { english: "see", type: "v", hebrew: "לראות" },
+            { english: "selfie", type: "n", hebrew: "סלפי" },
+            { english: "sense of humor", type: "phrase", hebrew: "חוש הומור" },
+            { english: "smell", type: "n, v", hebrew: "ריח, להריח" },
+            { english: "smoke", type: "n, v", hebrew: "עשן, לעשן" },
+            { english: "so that", type: "phrase", hebrew: "כדי ש" },
+            { english: "stranger", type: "n", hebrew: "זר" },
+            { english: "study", type: "n, v", hebrew: "מחקר, ללמוד" },
+            { english: "the public", type: "phrase", hebrew: "הציבור" },
+            { english: "the same thing", type: "phrase", hebrew: "אותו דבר" },
+            { english: "tweet", type: "n, v", hebrew: "ציוץ, לצייץ" }
+        ];
+
+        let currentIndex = 0;
+        let knownCount = 0;
+        let learningCount = 0;
+        let wordsToReview = [];
+        let isFlipped = false;
+
+        function updateScores() {
+            document.getElementById('knownScore').textContent = knownCount;
+            document.getElementById('learningScore').textContent = learningCount;
+        }
+
+        function updateProgress() {
+            const progress = ((currentIndex) / words.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+
+        function showCard() {
+            const cardArea = document.getElementById('cardArea');
+            const word = words[currentIndex];
+            isFlipped = false;
+
+            cardArea.innerHTML = `
+                <div class="card-container">
+                    <div class="flashcard" id="flashcard" onclick="flipCard()">
+                        <div class="card-face card-front">
+                            <div class="word-type">${word.type}</div>
+                            <div class="english-word">${word.english}</div>
+                        </div>
+                        <div class="card-face card-back">
+                            <div class="english-word">${word.english}</div>
+                            <div class="hebrew-translation">${word.hebrew}</div>
+                            <div class="question">Did you know?</div>
+                            <div class="button-group">
+                                <button class="btn btn-yes" onclick="handleResponse(true, event)">Yes ✓</button>
+                                <button class="btn btn-no" onclick="handleResponse(false, event)">No ✗</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flip-hint">👆 Click the card to flip</div>
+            `;
+        }
+
+        function flipCard() {
+            if (!isFlipped) {
+                document.getElementById('flashcard').classList.add('flipped');
+                isFlipped = true;
+            }
+        }
+
+        function handleResponse(knew, event) {
+            event.stopPropagation();
+            
+            if (knew) {
+                knownCount++;
+            } else {
+                learningCount++;
+                wordsToReview.push(words[currentIndex]);
+            }
+
+            updateScores();
+            currentIndex++;
+            updateProgress();
+
+            if (currentIndex < words.length) {
+                setTimeout(() => {
+                    showCard();
+                }, 300);
+            } else {
+                setTimeout(() => {
+                    showResults();
+                }, 300);
+            }
+        }
+
+        function showResults() {
+            const cardArea = document.getElementById('cardArea');
+            const percentage = Math.round((knownCount / words.length) * 100);
+
+            let reviewHTML = '';
+            if (wordsToReview.length > 0) {
+                reviewHTML = `
+                    <div class="words-to-review">
+                        <h3 class="review-title">📝 Words to Review (${wordsToReview.length})</h3>
+                        <div class="word-list">
+                            ${wordsToReview.map(word => `
+                                <div class="word-item">
+                                    <div class="english">${word.english} <span style="color: var(--text-light); font-size: 0.85rem;">(${word.type})</span></div>
+                                    <div class="hebrew">${word.hebrew}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            cardArea.innerHTML = `
+                <div class="results-screen">
+                    <h2 class="results-title">🎉 Great Job!</h2>
+                    <div class="results-stats">
+                        <div class="stat-box">
+                            <div class="stat-label">Total Words</div>
+                            <div class="stat-value">${words.length}</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-label">Known</div>
+                            <div class="stat-value" style="color: var(--primary);">${knownCount}</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-label">To Review</div>
+                            <div class="stat-value" style="color: var(--accent);">${learningCount}</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-label">Score</div>
+                            <div class="stat-value" style="color: var(--secondary);">${percentage}%</div>
+                        </div>
+                    </div>
+                    ${reviewHTML}
+                    <button class="btn btn-restart" onclick="restart()">Start Again</button>
+                </div>
+            `;
+        }
+
+        function restart() {
+            currentIndex = 0;
+            knownCount = 0;
+            learningCount = 0;
+            wordsToReview = [];
+            updateScores();
+            updateProgress();
+            showCard();
+        }
+
+        // Initialize
+        updateScores();
+        updateProgress();
+        showCard();
+    </script>
+</body>
+</html>
