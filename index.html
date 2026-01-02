@@ -305,6 +305,81 @@
             opacity: 0.7;
         }
 
+        .navigation {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            font-family: 'Space Mono', monospace;
+            padding: 12px 25px;
+            border: 2px solid var(--primary);
+            background: transparent;
+            color: var(--primary);
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .counter {
+            font-family: 'Space Mono', monospace;
+            color: var(--text-light);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+        }
+
+        .mode-toggle {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            gap: 15px;
+        }
+
+        .mode-btn {
+            font-family: 'Space Mono', monospace;
+            padding: 12px 30px;
+            border: 2px solid var(--accent);
+            background: transparent;
+            color: var(--accent);
+            border-radius: 25px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .mode-btn.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        .mode-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px var(--shadow);
+        }
+
         .results-screen {
             background: var(--card-bg);
             border-radius: 20px;
@@ -468,6 +543,11 @@
             <div class="progress-fill" id="progressFill"></div>
         </div>
 
+        <div class="mode-toggle">
+            <button class="mode-btn active" id="allWordsBtn" onclick="setMode('all')">כל המילים</button>
+            <button class="mode-btn" id="reviewBtn" onclick="setMode('review')">רק לחזרה</button>
+        </div>
+
         <div id="cardArea"></div>
     </div>
 
@@ -479,100 +559,59 @@
             { english: "relatively", type: "adv", hebrew: "יחסית" },
             { english: "elementary", type: "adj", hebrew: "יסודי" },
             
-            // 1. Sequencing Connectors
-            { english: "first", type: "Sequencing", hebrew: "ראשית" },
-            { english: "firstly", type: "Sequencing", hebrew: "ראשית" },
-            { english: "second", type: "Sequencing", hebrew: "שנית" },
-            { english: "secondly", type: "Sequencing", hebrew: "שנית" },
-            { english: "third", type: "Sequencing", hebrew: "שלישית" },
+            // 1. Sequencing
+            { english: "first", type: "Sequencing", hebrew: "ראשון/ראשית" },
+            { english: "to begin with", type: "Sequencing", hebrew: "להתחיל עם" },
+            { english: "initially", type: "Sequencing", hebrew: "בהתחלה" },
             { english: "then", type: "Sequencing", hebrew: "אז, לאחר מכן" },
-            { english: "next", type: "Sequencing", hebrew: "לאחר מכן" },
-            { english: "after that", type: "Sequencing", hebrew: "אחרי זה" },
-            { english: "afterwards", type: "Sequencing", hebrew: "לאחר מכן" },
+            { english: "next", type: "Sequencing", hebrew: "הבא/לאחר מכן" },
+            { english: "afterwards", type: "Sequencing", hebrew: "אחר כך/מאוחר יותר" },
+            { english: "later", type: "Sequencing", hebrew: "מאוחר יותר" },
             { english: "finally", type: "Sequencing", hebrew: "לבסוף" },
-            { english: "lastly", type: "Sequencing", hebrew: "לבסוף" },
             { english: "eventually", type: "Sequencing", hebrew: "בסופו של דבר" },
+            { english: "in the end", type: "Sequencing", hebrew: "בסוף" },
             { english: "meanwhile", type: "Sequencing", hebrew: "בינתיים" },
-            { english: "simultaneously", type: "Sequencing", hebrew: "במקביל, בו זמנית" },
-            { english: "previously", type: "Sequencing", hebrew: "בעבר, קודם לכן" },
+            { english: "subsequently", type: "Sequencing", hebrew: "לאחר מכן/בהמשך" },
             
-            // 2. Adding Connectors
-            { english: "and", type: "Adding", hebrew: "ו" },
-            { english: "also", type: "Adding", hebrew: "גם" },
+            // 2. Adding
+            { english: "moreover", type: "Adding", hebrew: "יתר על כן/יותר מזה" },
             { english: "furthermore", type: "Adding", hebrew: "יתר על כן" },
-            { english: "moreover", type: "Adding", hebrew: "יתרה מזאת" },
-            { english: "in addition", type: "Adding", hebrew: "בנוסף" },
-            { english: "additionally", type: "Adding", hebrew: "בנוסף" },
-            { english: "besides", type: "Adding", hebrew: "חוץ מזה" },
+            { english: "in addition", type: "Adding", hebrew: "בנוסף לכך" },
+            { english: "also", type: "Adding", hebrew: "גם" },
             { english: "as well as", type: "Adding", hebrew: "כמו גם" },
             { english: "not only... but also", type: "Adding", hebrew: "לא רק... אלא גם" },
-            { english: "along with", type: "Adding", hebrew: "יחד עם" },
-            { english: "together with", type: "Adding", hebrew: "ביחד עם" },
             
-            // 3. Contrast Connectors
-            { english: "but", type: "Contrast", hebrew: "אבל" },
-            { english: "however", type: "Contrast", hebrew: "אולם, עם זאת" },
-            { english: "nevertheless", type: "Contrast", hebrew: "בכל זאת" },
-            { english: "nonetheless", type: "Contrast", hebrew: "בכל זאת" },
+            // 3. Contrast
+            { english: "however", type: "Contrast", hebrew: "אולם" },
             { english: "although", type: "Contrast", hebrew: "למרות ש" },
-            { english: "though", type: "Contrast", hebrew: "למרות ש" },
-            { english: "even though", type: "Contrast", hebrew: "למרות ש" },
-            { english: "despite", type: "Contrast", hebrew: "למרות" },
-            { english: "in spite of", type: "Contrast", hebrew: "למרות" },
-            { english: "whereas", type: "Contrast", hebrew: "בעוד ש" },
-            { english: "while", type: "Contrast", hebrew: "בעוד ש" },
+            { english: "even though", type: "Contrast", hebrew: "למרות ש/אף ש" },
             { english: "on the other hand", type: "Contrast", hebrew: "מצד שני" },
-            { english: "on the contrary", type: "Contrast", hebrew: "להיפך" },
-            { english: "in contrast", type: "Contrast", hebrew: "בניגוד" },
-            { english: "conversely", type: "Contrast", hebrew: "להיפך" },
-            { english: "yet", type: "Contrast", hebrew: "ובכל זאת" },
-            { english: "still", type: "Contrast", hebrew: "עדיין" },
+            { english: "in contrast", type: "Contrast", hebrew: "בניגוד לכך" },
+            { english: "nevertheless", type: "Contrast", hebrew: "בכל זאת/אף על פי כן" },
+            { english: "whereas", type: "Contrast", hebrew: "בעוד ש" },
             
-            // 4. Cause & Effect Connectors
-            { english: "because", type: "Cause & Effect", hebrew: "כי, מפני ש" },
-            { english: "since", type: "Cause & Effect", hebrew: "מאז, מכיוון ש" },
-            { english: "as", type: "Cause & Effect", hebrew: "מכיוון ש" },
+            // 4. Cause and Effect
             { english: "therefore", type: "Cause & Effect", hebrew: "לכן" },
-            { english: "thus", type: "Cause & Effect", hebrew: "לפיכך" },
-            { english: "hence", type: "Cause & Effect", hebrew: "מכאן ש" },
-            { english: "so", type: "Cause & Effect", hebrew: "אז, לכן" },
-            { english: "consequently", type: "Cause & Effect", hebrew: "כתוצאה מכך" },
             { english: "as a result", type: "Cause & Effect", hebrew: "כתוצאה מכך" },
-            { english: "due to", type: "Cause & Effect", hebrew: "בגלל" },
-            { english: "owing to", type: "Cause & Effect", hebrew: "בשל" },
-            { english: "for this reason", type: "Cause & Effect", hebrew: "מסיבה זו" },
-            { english: "that's why", type: "Cause & Effect", hebrew: "זו הסיבה ש" },
+            { english: "consequently", type: "Cause & Effect", hebrew: "כתוצאה מכך/לפיכך" },
+            { english: "because", type: "Cause & Effect", hebrew: "בגלל ש/מכיוון ש" },
+            { english: "since", type: "Cause & Effect", hebrew: "מכיוון ש/מאז" },
+            { english: "thus", type: "Cause & Effect", hebrew: "לכן/כך" },
             
-            // 5. Clarifying/Explanation Connectors
+            // 5. Clarifying + Explanation
             { english: "in other words", type: "Clarifying", hebrew: "במילים אחרות" },
-            { english: "that is", type: "Clarifying", hebrew: "כלומר" },
             { english: "that is to say", type: "Clarifying", hebrew: "כלומר" },
-            { english: "namely", type: "Clarifying", hebrew: "דהיינו" },
-            { english: "i.e.", type: "Clarifying", hebrew: "כלומר" },
-            { english: "to clarify", type: "Clarifying", hebrew: "להבהיר" },
-            { english: "to put it another way", type: "Clarifying", hebrew: "במילים אחרות" },
-            { english: "in fact", type: "Clarifying", hebrew: "למעשה" },
-            { english: "actually", type: "Clarifying", hebrew: "למעשה, בעצם" },
-            { english: "specifically", type: "Clarifying", hebrew: "באופן ספציפי" },
             { english: "for example", type: "Clarifying", hebrew: "לדוגמה" },
             { english: "for instance", type: "Clarifying", hebrew: "למשל" },
-            { english: "such as", type: "Clarifying", hebrew: "כגון" },
-            { english: "like", type: "Clarifying", hebrew: "כמו" },
+            { english: "specifically", type: "Clarifying", hebrew: "באופן ספציפי/ספציפית" },
+            { english: "to illustrate", type: "Clarifying", hebrew: "כדי להמחיש" },
             
-            // 6. Emphasis Connectors
+            // 6. Emphasis
+            { english: "clearly", type: "Emphasis", hebrew: "ברור ש/בבירור" },
+            { english: "significantly", type: "Emphasis", hebrew: "משמעותית" },
             { english: "indeed", type: "Emphasis", hebrew: "אכן" },
-            { english: "certainly", type: "Emphasis", hebrew: "בהחלט" },
-            { english: "obviously", type: "Emphasis", hebrew: "ברור ש" },
-            { english: "clearly", type: "Emphasis", hebrew: "ברור ש" },
-            { english: "undoubtedly", type: "Emphasis", hebrew: "ללא ספק" },
-            { english: "in fact", type: "Emphasis", hebrew: "למעשה" },
-            { english: "as a matter of fact", type: "Emphasis", hebrew: "למעשה" },
-            { english: "above all", type: "Emphasis", hebrew: "מעל הכל" },
-            { english: "especially", type: "Emphasis", hebrew: "במיוחד" },
-            { english: "particularly", type: "Emphasis", hebrew: "בפרט" },
-            { english: "notably", type: "Emphasis", hebrew: "במיוחד" },
-            { english: "significantly", type: "Emphasis", hebrew: "באופן משמעותי" },
-            { english: "importantly", type: "Emphasis", hebrew: "באופן חשוב" }
+            { english: "above all", type: "Emphasis", hebrew: "מעל לכל/בעיקר" },
+            { english: "especially", type: "Emphasis", hebrew: "במיוחד" }
         ];
 
         let currentIndex = 0;
@@ -580,6 +619,49 @@
         let learningCount = 0;
         let wordsToReview = [];
         let isFlipped = false;
+        let currentMode = 'all'; // 'all' or 'review'
+        let displayWords = [...words]; // Copy of words to display
+        let answeredWords = new Set(); // Track which words have been answered
+
+        // Shuffle function
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        // Initialize with shuffled words
+        displayWords = shuffleArray(words);
+
+        function setMode(mode) {
+            if (mode === 'review' && wordsToReview.length === 0) {
+                alert('אין עדיין מילים לחזרה! תחילה עבור על כל המילים.');
+                return;
+            }
+
+            currentMode = mode;
+            
+            // Update button states
+            document.getElementById('allWordsBtn').classList.toggle('active', mode === 'all');
+            document.getElementById('reviewBtn').classList.toggle('active', mode === 'review');
+
+            // Reset and start appropriate mode
+            if (mode === 'all') {
+                displayWords = shuffleArray(words);
+                currentIndex = 0;
+                answeredWords.clear();
+            } else {
+                displayWords = shuffleArray(wordsToReview);
+                currentIndex = 0;
+                answeredWords.clear();
+            }
+
+            updateProgress();
+            showCard();
+        }
 
         function updateScores() {
             document.getElementById('knownScore').textContent = knownCount;
@@ -587,14 +669,24 @@
         }
 
         function updateProgress() {
-            const progress = ((currentIndex) / words.length) * 100;
+            const total = displayWords.length;
+            const progress = (answeredWords.size / total) * 100;
             document.getElementById('progressFill').style.width = progress + '%';
+        }
+
+        function navigateCard(direction) {
+            const newIndex = currentIndex + direction;
+            if (newIndex >= 0 && newIndex < displayWords.length) {
+                currentIndex = newIndex;
+                showCard();
+            }
         }
 
         function showCard() {
             const cardArea = document.getElementById('cardArea');
-            const word = words[currentIndex];
+            const word = displayWords[currentIndex];
             isFlipped = false;
+            const isAnswered = answeredWords.has(currentIndex);
 
             cardArea.innerHTML = `
                 <div class="card-container">
@@ -607,14 +699,20 @@
                             <div class="english-word">${word.english}</div>
                             <div class="hebrew-translation">${word.hebrew}</div>
                             <div class="question">Did you know?</div>
-                            <div class="button-group">
+                            <div class="button-group" style="display: ${isAnswered ? 'none' : 'flex'}">
                                 <button class="btn btn-yes" onclick="handleResponse(true, event)">Yes ✓</button>
                                 <button class="btn btn-no" onclick="handleResponse(false, event)">No ✗</button>
                             </div>
+                            ${isAnswered ? '<div style="color: var(--primary); font-family: \'Space Mono\', monospace; margin-top: 20px;">✓ נענה</div>' : ''}
                         </div>
                     </div>
                 </div>
-                <div class="flip-hint">👆 Click the card to flip</div>
+                <div class="flip-hint">👆 לחץ על הכרטיס להפוך</div>
+                <div class="navigation">
+                    <button class="nav-btn" onclick="navigateCard(-1)" ${currentIndex === 0 ? 'disabled' : ''}>← הקודם</button>
+                    <div class="counter">${currentIndex + 1} / ${displayWords.length}</div>
+                    <button class="nav-btn" onclick="navigateCard(1)" ${currentIndex === displayWords.length - 1 ? 'disabled' : ''}>הבא →</button>
+                </div>
             `;
         }
 
@@ -628,24 +726,36 @@
         function handleResponse(knew, event) {
             event.stopPropagation();
             
-            if (knew) {
-                knownCount++;
-            } else {
-                learningCount++;
-                wordsToReview.push(words[currentIndex]);
+            // Mark this word as answered
+            answeredWords.add(currentIndex);
+
+            // Only update scores in 'all' mode
+            if (currentMode === 'all') {
+                const word = displayWords[currentIndex];
+                
+                if (knew) {
+                    knownCount++;
+                } else {
+                    learningCount++;
+                    // Add to review list only if not already there
+                    if (!wordsToReview.some(w => w.english === word.english)) {
+                        wordsToReview.push(word);
+                    }
+                }
+                updateScores();
             }
 
-            updateScores();
-            currentIndex++;
             updateProgress();
 
-            if (currentIndex < words.length) {
-                setTimeout(() => {
-                    showCard();
-                }, 300);
-            } else {
+            // Check if all words have been answered
+            if (answeredWords.size === displayWords.length) {
                 setTimeout(() => {
                     showResults();
+                }, 300);
+            } else {
+                // Move to next unanswered card or stay on current
+                setTimeout(() => {
+                    showCard();
                 }, 300);
             }
         }
@@ -703,6 +813,14 @@
             knownCount = 0;
             learningCount = 0;
             wordsToReview = [];
+            answeredWords.clear();
+            currentMode = 'all';
+            displayWords = shuffleArray(words);
+            
+            // Reset mode buttons
+            document.getElementById('allWordsBtn').classList.add('active');
+            document.getElementById('reviewBtn').classList.remove('active');
+            
             updateScores();
             updateProgress();
             showCard();
